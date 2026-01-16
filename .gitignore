@@ -1,0 +1,61 @@
+# --------------------
+# Python artifacts
+# --------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# --------------------
+# VS Code
+# --------------------
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# --------------------
+# OS / editor noise
+# --------------------
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# --------------------
+# Logs & temp files
+# --------------------
+*.log
+*.tmp
+
+
+# --------------------
+# Other files
+# --------------------
+
+dataset/radio_galaxy_dataset/galaxy_data
+experiments/
+images/
+uv_coverages/
+checkpoints/
+data/
