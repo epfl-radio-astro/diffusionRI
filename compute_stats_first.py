@@ -4,7 +4,7 @@ from real_valued.trainer import LitDDPM
 from real_valued.unet import Unet
 from helpers import first_radio_galaxy_transform_val
 from torch.utils.data import DataLoader
-from radio_galaxy_dataset.firstgalaxydata import FIRSTGalaxyData
+from dataset.radio_galaxy_dataset.firstgalaxydata import FIRSTGalaxyData
 
 import numpy as np
 from ddrm.svd_replacement import Fourier2D
@@ -22,7 +22,6 @@ if torch.cuda.is_available():
     idx = torch.cuda.current_device()
     print("Current device:", idx)
     print("Name:", torch.cuda.get_device_name(idx))
-    # quick sanity: actually allocate on it
     x = torch.randn(1, device=f"cuda:{idx}")
     print("Tensor device:", x.device)
 
