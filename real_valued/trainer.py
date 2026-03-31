@@ -127,7 +127,7 @@ class LitDDPM(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         x_0 = batch.unsqueeze(1)
         with self.ema.average_parameters():
-            mask = torch.from_numpy(np.load("uv_coverages/uv_sampling_60_steps.npy"))
+            mask = torch.from_numpy(np.load("uv_coverages/VLA_mask_150.npy"))
             h = Fourier2D(
                 channels=1, img_dim=self.image_size, S=mask, device=self.device
             )
@@ -149,7 +149,6 @@ class LitDDPM(pl.LightningModule):
         self.log("val/mse", mse, prog_bar=True, on_epoch=True, sync_dist=True)
         self.log("val/mae", mae, on_epoch=True, sync_dist=True)
         self.log("val/psnr", psnr, prog_bar=True, on_epoch=True, sync_dist=True)
-
         save_tall_image_grid(
             x_hat, self.save_path + f"epoch_{self.current_epoch}_batch_{batch_idx}.png"
         )

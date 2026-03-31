@@ -6,18 +6,37 @@
 
 ### Runtime environment
 
-We used the NVIDIA PyTorch container image 
+#### Option A: Conda (standalone, recommended for most users)
+
+Create a new conda environment with CUDA-enabled PyTorch:
+
+```bash
+conda create -n diffusionRI python=3.11 -y
+conda activate diffusionRI
+
+# Install PyTorch with CUDA support (adjust cu128 to match your CUDA version, e.g. cu121, cu124)
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+
+# Install remaining dependencies
+pip install pytorch-lightning torch-ema astropy h5py matplotlib numpy pandas Pillow tensorboard
+```
+
+To check your CUDA version: `nvidia-smi | grep "CUDA Version"`
+
+#### Option B: NGC container (original environment)
+
+We used the NVIDIA PyTorch container image
 
 [ngc-pytorch_25.08.sqsh](https://docs.nvidia.com/deeplearning/frameworks/pytorch-release-notes/rel-25-08.html)
 
-The dependencies list are provided in requirements-extra.txt
+The full container dependency list is provided in `extra-requirements.txt`.
 
-To recreate the environement run (inside the container image)
+To recreate the environment run (inside the container image):
 
-```
-    python3 -m venv venv-pt-25.08 
-    source venv-pt-25.08/bin/activate 
-    pip install -r requirements-extra.txt
+```bash
+python3 -m venv venv-pt-25.08
+source venv-pt-25.08/bin/activate
+pip install -r extra-requirements.txt
 ```
 
 
