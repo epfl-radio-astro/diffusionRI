@@ -137,7 +137,67 @@ class Fourier2D(H_functions):
         temp[:, :reshaped.shape[1]] = reshaped
         return temp
     
+class Fourier2D_num(H_functions):
+    def __init__(self, channels, img_dim, S, device):
+        self.channels = channels
+        self.img_dim = img_dim
+        # To make hermitian symmetric
+# To make hermitian symmetric
+        S = torch.maximum(S, S.transpose(0, 1))
+        S_flat = S.flatten()
+        missing_indices = torch.where(S_flat == 0)[0]
+        self.missing_indices = missing_indices
 
+        self.kept_indices = torch.Tensor(
+            [i for i in range(channels * img_dim**2) if i not in missing_indices]
+        ).long()
+
+        self._singulars = S_flat[self.kept_indices].to(device).float()
+        self.kept_indices = self.kept_indices.to(device)
+        self.device = device
+ 
+
+    
+    
+    def V(self, vec):
+        temp = vec.clone().reshape(vec.shape[0], -1)
+
+        out = torch.zeros_like(temp)
+        out[:, self.kept_indices] = temp[:, :self.kept_indices.shape[0]]
+        out[:, self.missing_indices] = temp[:, self.kept_indices.shape[0]:]
+
+        out = out.reshape(vec.shape[0], self.channels, self.img_dim, self.img_dim)
+        out = tfft.ifft2(tfft.ifftshift(out, dim=(-2, -1)), norm='ortho').real
+        out = out.reshape(vec.shape[0], -1)
+
+        return out
+    
+    def Vt(self, vec):
+        vec = tfft.fftshift(tfft.fft2(vec.float(), norm='ortho'), dim=(-2,-1))
+        temp = vec.clone().reshape(vec.shape[0], self.channels, -1).permute(0, 2, 1).reshape(vec.shape[0], -1)
+        out = torch.zeros_like(temp)
+        out[:, :self.kept_indices.shape[0]] = temp[:, self.kept_indices]
+        out[:, self.kept_indices.shape[0]:] = temp[:, self.missing_indices]
+        return out
+    
+    
+    def U(self, vec):
+        return vec.clone().reshape(vec.shape[0], -1)
+
+    def Ut(self, vec):
+        return vec.clone().reshape(vec.shape[0], -1)
+
+    
+
+    def singulars(self):
+        return self._singulars
+
+    def add_zeros(self, vec):
+        temp = torch.zeros((vec.shape[0], self.channels * self.img_dim**2), device=vec.device, dtype=vec.dtype)
+        reshaped = vec.clone().reshape(vec.shape[0], -1)
+        temp[:, :reshaped.shape[1]] = reshaped
+        return temp
+    
 
 # class FourierInpainting(H_functions):
 #     def __init__(self, channels, img_dim, missing_indices, device):

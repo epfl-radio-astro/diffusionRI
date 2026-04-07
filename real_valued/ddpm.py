@@ -287,3 +287,18 @@ class DDPM(nn.Module):
         )
 
         return retval, pinv_y_0
+
+    @torch.no_grad()    
+    def sample_ddrm_y0(self, image_size, timesteps, y_0, x_shape, H_funcs, sigma_0, eta_A, eta_B, eta_C):
+
+        x = torch.randn(x_shape, 1, image_size, image_size, device=self.device)
+
+        pinv_y_0 = H_funcs.H_pinv(y_0)
+
+        skip = self.num_timesteps // timesteps
+        seq = range(0, self.num_timesteps, skip)
+        retval = self.p_sample_ddrm_loop(
+            x, y_0, seq, H_funcs, eta_A, eta_B, eta_C, sigma_0 * 2
+        )
+
+        return retval, pinv_y_0
