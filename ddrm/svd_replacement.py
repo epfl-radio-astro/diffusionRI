@@ -190,8 +190,6 @@ class Fourier2D_weight(H_functions):
     def Ut(self, vec):
         return vec.clone().reshape(vec.shape[0], -1)
 
-    
-
     def singulars(self):
         return self._singulars
 
