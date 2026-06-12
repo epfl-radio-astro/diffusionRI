@@ -84,13 +84,21 @@ class H_functions:
         temp[:, :singulars.shape[0]] = temp[:, :singulars.shape[0]]
         return self.V(self.add_zeros(temp))
     
-    
+
+
+def make_hermitian(S):
+
+    S = torch.fft.ifftshift(S)
+    S_rev = torch.roll(torch.flip(S, dims=(-2, -1)), shifts=(1, 1), dims=(-2, -1))
+    return torch.fft.fftshift(((S + S_rev) > 0).to(S.dtype))
+
 class Fourier2D_mask(H_functions):
     def __init__(self, channels, img_dim, S, device):
         self.channels = channels
         self.img_dim = img_dim
-        # To make hermitian symmetric
-        S = S | S.transpose(0, 1)
+
+        S = make_hermitian(S)
+
         S_flat = S.flatten()
         missing_indices = torch.where(S_flat == 0)[0]
         self.missing_indices = missing_indices
@@ -143,12 +151,18 @@ class Fourier2D_mask(H_functions):
         reshaped = vec.clone().reshape(vec.shape[0], -1)
         temp[:, :reshaped.shape[1]] = reshaped
         return temp
-    
+
+def make_weighted_hermitian(S):
+    S = torch.fft.ifftshift(S)
+    S_rev = torch.roll(torch.flip(S, dims=(-2, -1)), shifts=(1, 1), dims=(-2, -1))
+    out = torch.maximum(S, S_rev)      # symmetric, stays in [0,1]
+    return torch.fft.fftshift(out)
+
 class Fourier2D_weight(H_functions):
     def __init__(self, channels, img_dim, S, device):
         self.channels = channels
         self.img_dim = img_dim
-        S = torch.maximum(S, S.transpose(0, 1))
+        S = make_weighted_hermitian(S)
         S_flat = S.flatten()
         missing_indices = torch.where(S_flat == 0)[0]
         self.missing_indices = missing_indices
