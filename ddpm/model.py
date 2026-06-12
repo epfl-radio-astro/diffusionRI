@@ -1,4 +1,5 @@
 import math
+import os
 import torch
 import torch.nn as nn
 import numpy as np
@@ -197,6 +198,9 @@ class DDPM(nn.Module):
 
             at = extract(self.alpha_bars, t.long(), xs[-1].shape)
             at_next = extract(self.alpha_bars, next_t.long(), xs[-1].shape)
+
+            if  j == -1:
+                at_next = torch.ones_like(at_next)
             xt = xs[-1]
 
             # consult the model
@@ -226,7 +230,6 @@ class DDPM(nn.Module):
             sigma_tilde_nextA = torch.sqrt(
                 torch.clamp(sigma_next**2 - std_nextA**2, min=0)
             )
-
             diff_sigma_t_nextB = torch.sqrt(
                 sigma_next**2
                 - sigma_0**2 / singulars[cond_before_lite] ** 2 * (eta_B**2)
