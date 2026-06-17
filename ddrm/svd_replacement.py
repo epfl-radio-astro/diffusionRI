@@ -97,8 +97,6 @@ class Fourier2D_mask(H_functions):
         self.channels = channels
         self.img_dim = img_dim
 
-        S = make_hermitian(S)
-
         S_flat = S.flatten()
         missing_indices = torch.where(S_flat == 0)[0]
         self.missing_indices = missing_indices
@@ -162,7 +160,6 @@ class Fourier2D_weight(H_functions):
     def __init__(self, channels, img_dim, S, device):
         self.channels = channels
         self.img_dim = img_dim
-        S = make_weighted_hermitian(S)
         S_flat = S.flatten()
         missing_indices = torch.where(S_flat == 0)[0]
         self.missing_indices = missing_indices
